@@ -1,15 +1,15 @@
-const { Conflux, util } = require("js-conflux-sdk");
+const { Conflux, Drip } = require("js-conflux-sdk");
 require("dotenv").config();
 
 const cfx = new Conflux({
   url: "http://testnet-jsonrpc.conflux-chain.org:12537",
   defaultGasPrice: 100, // The default gas price of your following transactions
   defaultGas: 1000000, // The default gas of your following transactions
-  logger: console,
+  logger: console
 });
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
-const account = cfx.Account(PRIVATE_KEY); // create account instance
+const account = cfx.Account({ privateKey: PRIVATE_KEY }); // create account instance
 const receiver = "0x15fd1E4F13502b1a8BE110F100EC001d0270552d"; //sending to self
 
 let txParams = {
@@ -18,14 +18,14 @@ let txParams = {
   // gasPrice
   // gas
   to: receiver, // accept address string or account instance
-  value: util.unit.fromCFXToDrip(0.125), // use unit to transfer from 0.125 CFX to Drip
+  value: Drip.fromCFX(0.125) // use unit to transfer from 0.125 CFX to Drip
   // storageLimit
   // epochHeight
   // data
 };
 
 async function main() {
-  const txHash = await cfx.sendTransaction(txParams);
+  const txHash = await account.sendTransaction(txParams).executed();
   console.log(txHash);
 }
 

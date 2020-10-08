@@ -10,14 +10,14 @@ async function main() {
     url: 'http://testnet-jsonrpc.conflux-chain.org:12537',
     defaultGasPrice: 100,
     defaultGas: 1000000,
-    // logger: console,
+    logger: console,
   });
 
   console.log(cfx.defaultGasPrice); // 100
   console.log(cfx.defaultGas); // 1000000
 
   // ================================ Account =================================
-  const account = cfx.Account(PRIVATE_KEY); // create account instance
+  const account = cfx.Account({ privateKey: PRIVATE_KEY }); // create account instance
   console.log(account.address); // 0x1bd9e9be525ab967e633bcdaeac8bd5723ed4d6b
 
   // ================================ Contract ================================
@@ -29,12 +29,12 @@ async function main() {
   });
 
   // estimate deploy contract gas use
-  const estimate = await contract.constructor().estimateGasAndCollateral();
+  const tx = contract.constructor();
+  const estimate = await cfx.estimateGasAndCollateral(tx)
   console.log(JSON.stringify(estimate)); // {"gasUsed":"175050","storageCollateralized":"64"}
 
   // deploy the contract, and get `contractCreated`
-  const receipt = await contract.constructor()
-    .sendTransaction({ from: account});
+  const receipt = await account.sendTransaction(tx).executed();
   console.log(receipt);
 }
 
